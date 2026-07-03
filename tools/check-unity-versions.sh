@@ -90,7 +90,7 @@ error: --docker requires a Unity license. Set UNITY_LICENSE to the contents of a
 
 One-time setup (free Personal license):
   1. Generate a request file inside a GameCI container:
-       docker run --rm -v "$PWD":/work unityci/editor:ubuntu-2021.3.45f2-base-3 \
+       docker run --rm -v "$PWD":/work unityci/editor:ubuntu-2020.3.48f1-base-3 \
          /opt/unity/Editor/Unity -batchmode -nographics -quit -createManualActivationFile \
          -logFile /dev/stdout
      This writes Unity_v<version>.alf to your current directory.

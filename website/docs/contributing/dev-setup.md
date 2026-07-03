@@ -231,7 +231,7 @@ open htmlcov/index.html
 
 ## Compatibility Notes
 
-The Unity package currently declares Unity `2021.3` as its minimum version in `MCPForUnity/package.json`. Code that uses Unity API conditionals (`UNITY_2022_3_OR_NEWER`, `UNITY_2023_1_OR_NEWER`, `UNITY_6000_*`) should be tested against the affected editor line, not just the oldest supported version.
+The Unity package currently declares Unity `2020.3` as its minimum version in `MCPForUnity/package.json`. Code that uses Unity API conditionals (`UNITY_2022_3_OR_NEWER`, `UNITY_2023_1_OR_NEWER`, `UNITY_6000_*`) should be tested against the affected editor line, not just the oldest supported version.
 
 For compatibility PRs, note the exact editor versions you tested in the PR body. If a Git package URL is involved, include the resolved `packages-lock.json` hash.
 
@@ -257,7 +257,7 @@ CI exercises the package across multiple Unity versions to catch breaks in `#if 
 
 Fork PRs still need `safe-to-test` as the base gate (so secrets are exposed against reviewed-only fork code); `full-matrix` is layered on top for fork-PR full-matrix runs.
 
-**Default (single leg)** — every other path runs only against `defaultVersion` from `tools/unity-versions.json` (currently Unity 6.0 LTS, `6000.0.75f1`). The `floor` role (`2021.3.45f2`) still identifies the package minimum and runs as part of the full matrix; it's no longer the default-leg version.
+**Default (single leg)** — every other path runs only against `defaultVersion` from `tools/unity-versions.json` (currently Unity 6.0 LTS, `6000.0.75f1`). The `floor` role (`2020.3.48f1`) still identifies the package minimum and runs as part of the full matrix; it's no longer the default-leg version.
 
 ## Local Unity-version parity check
 
@@ -291,7 +291,7 @@ pwsh .\tools\check-unity-versions.ps1 -Full
 pwsh .\tools\check-unity-versions.ps1 -Only 6000.0
 ```
 
-Versions not installed via Unity Hub are skipped — the script never forces you to install every editor in the matrix. Install the versions you most care about (typically the floor `2021.3.45f2` and your daily-driver Unity 6) and CI / Docker mode cover the rest.
+Versions not installed via Unity Hub are skipped — the script never forces you to install every editor in the matrix. Install the versions you most care about (typically the floor `2020.3.48f1` and your daily-driver Unity 6) and CI / Docker mode cover the rest.
 
 ### GameCI Docker mode (no Unity Hub install required)
 
@@ -312,7 +312,7 @@ GameCI containers still need an activated Unity license. Free Personal activatio
 
 ```bash
 # 1. Generate the request file (.alf) — outputs Unity_v<version>.alf in the current directory.
-docker run --rm -v "$PWD":/work unityci/editor:ubuntu-2021.3.45f2-base-3 \
+docker run --rm -v "$PWD":/work unityci/editor:ubuntu-2020.3.48f1-base-3 \
   /opt/unity/Editor/Unity -batchmode -nographics -quit \
   -createManualActivationFile -logFile /dev/stdout
 

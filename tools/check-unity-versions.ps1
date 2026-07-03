@@ -73,7 +73,7 @@ if ($Docker) {
     Write-Host ""
     Write-Host "One-time setup (free Personal license):"
     Write-Host "  1. Generate a request file inside a GameCI container:"
-    Write-Host "       docker run --rm -v `"`${PWD}:/work`" unityci/editor:ubuntu-2021.3.45f2-base-3 ``"
+    Write-Host "       docker run --rm -v `"`${PWD}:/work`" unityci/editor:ubuntu-2020.3.48f1-base-3 ``"
     Write-Host "         /opt/unity/Editor/Unity -batchmode -nographics -quit -createManualActivationFile ``"
     Write-Host "         -logFile /dev/stdout"
     Write-Host "     This writes Unity_v<version>.alf to your current directory."
