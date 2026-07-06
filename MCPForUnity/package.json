@@ -14,7 +14,6 @@
     "com.unity.modules.uielements": "1.0.0",
     "com.unity.modules.screencapture": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0",
-    "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.unity.test-framework": "1.1.31"
   },
   "keywords": [
