@@ -85,7 +85,12 @@ namespace MCPForUnity.Editor.Windows.Components.ClientConfig
 
         private void CacheUIElements()
         {
-            clientDropdown = Root.Q<PopupField<string>>("client-dropdown");
+            // 2020.3 无 DropdownField 的 UXML 工厂，UXML 里改为占位 VisualElement；
+            // 这里代码创建 PopupField<string> 塞进占位容器（2020.3 / 2021.2+ 通用）。
+            var clientDropdownHost = Root.Q<VisualElement>("client-dropdown");
+            clientDropdown = new PopupField<string>(new List<string> { string.Empty }, 0);
+            clientDropdown.AddToClassList("setting-dropdown-inline");
+            clientDropdownHost?.Add(clientDropdown);
             configureAllButton = Root.Q<Button>("configure-all-button");
             clientStatusIndicator = Root.Q<VisualElement>("client-status-indicator");
             clientStatusLabel = Root.Q<Label>("client-status");

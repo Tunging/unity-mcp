@@ -65,7 +65,12 @@ namespace MCPForUnity.Editor.Windows.Components.AssetGen
         {
             providersContainer = Root.Q<VisualElement>("assetgen-providers-container");
             gltfastNotice = Root.Q<VisualElement>("gltfast-notice");
-            formatDropdown = Root.Q<PopupField<string>>("assetgen-format-dropdown");
+            // 2020.3 无 DropdownField 的 UXML 工厂，UXML 里改为占位 VisualElement；
+            // 代码创建 PopupField<string> 塞进占位容器（2020.3 / 2021.2+ 通用）。
+            var formatDropdownHost = Root.Q<VisualElement>("assetgen-format-dropdown");
+            formatDropdown = new PopupField<string>(new List<string> { string.Empty }, 0);
+            formatDropdown.AddToClassList("setting-dropdown-inline");
+            formatDropdownHost?.Add(formatDropdown);
             outputRootField = Root.Q<TextField>("assetgen-output-root");
             autoNormalizeToggle = Root.Q<Toggle>("assetgen-auto-normalize");
         }

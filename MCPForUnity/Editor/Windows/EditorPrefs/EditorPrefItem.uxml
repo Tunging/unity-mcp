@@ -9,8 +9,8 @@
             <!-- Value field -->
             <ui:TextField name="value-field" class="value-field" />
             
-            <!-- Type dropdown -->
-            <ui:DropdownField name="type-dropdown" class="type-dropdown" choices="String,Int,Float,Bool" index="0" />
+            <!-- Type dropdown（2020.3 无 DropdownField 工厂，占位容器由代码填充 PopupField） -->
+            <ui:VisualElement name="type-dropdown" class="type-dropdown" />
             
             <!-- Action buttons -->
             <ui:VisualElement class="action-buttons">

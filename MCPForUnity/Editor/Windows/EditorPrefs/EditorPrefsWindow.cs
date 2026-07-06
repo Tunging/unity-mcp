@@ -329,7 +329,12 @@ namespace MCPForUnity.Editor.Windows
             var valueField = itemElement.Q<TextField>("value-field");
             valueField.value = item.Value;
 
-            var typeDropdown = itemElement.Q<PopupField<string>>("type-dropdown");
+            // 2020.3 无 DropdownField 的 UXML 工厂，模板里改为占位 VisualElement；
+            // 代码创建 PopupField<string> 塞进占位容器（2020.3 / 2021.2+ 通用）。
+            var typeDropdownHost = itemElement.Q<VisualElement>("type-dropdown");
+            var typeDropdown = new PopupField<string>(new List<string> { "String", "Int", "Float", "Bool" }, 0);
+            typeDropdown.AddToClassList("type-dropdown");
+            typeDropdownHost?.Add(typeDropdown);
             typeDropdown.index = (int)item.Type;
 
             // Buttons
