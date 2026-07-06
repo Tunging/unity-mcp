@@ -636,8 +636,8 @@ namespace MCPForUnity.Editor.Tools
                 treeArray.SetValue(syntaxTree, 0);
 
                 // Create compilation
-                var compilation = _createCompilation.Invoke(null, new object[] { "MCPDynamic", treeArray, refs, _compilationOptions });
-
+                // var compilation = _createCompilation.Invoke(null, new object[] { "MCPDynamic", treeArray, refs, _compilationOptions });
+                var compilation = _createCompilation.Invoke(null, new object[] { "MCPDynamic_" + Guid.NewGuid().ToString("N"), treeArray, refs, _compilationOptions });
                 // Emit to memory
                 using (var ms = new MemoryStream())
                 {
