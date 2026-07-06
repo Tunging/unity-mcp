@@ -93,5 +93,5 @@ Notes:
 ## Tips
 - Use Cmd+Shift+M (macOS) / Ctrl+Shift+M (Windows, Linux) to toggle the MCP for Unity window.
 - Enable “Show Debug Logs” in the header for more details in the Console when diagnosing issues.
-- Add ` "com.unity.nuget.newtonsoft-json": "3.0.2", ` to package.json if newtonsoft-json is not in your project.
+
 ---
