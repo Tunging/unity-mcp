@@ -128,7 +128,12 @@ namespace MCPForUnity.Editor.Services
             try
             {
                 string packageName = ExtractPackageName(job.Package);
+#if UNITY_2021_2_OR_NEWER
                 var allPackages = PackageInfo.GetAllRegisteredPackages();
+#else
+                // Unity 2020.3 无 PackageInfo.GetAllRegisteredPackages（2021.1 引入）；已注册包列表不可用，降级为空。
+                var allPackages = System.Array.Empty<UnityEditor.PackageManager.PackageInfo>();
+#endif
                 var info = FindPackageInfo(allPackages, packageName, job.Package);
 
                 if (job.Operation == "add" || job.Operation == "embed")

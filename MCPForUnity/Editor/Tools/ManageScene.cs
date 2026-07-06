@@ -9,6 +9,11 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if !UNITY_2021_2_OR_NEWER
+// Unity 2020.3：PrefabStage/PrefabStageUtility 位于 UnityEditor.Experimental.SceneManagement，2021.2 起迁移。
+using PrefabStage = UnityEditor.Experimental.SceneManagement.PrefabStage;
+using PrefabStageUtility = UnityEditor.Experimental.SceneManagement.PrefabStageUtility;
+#endif
 
 namespace MCPForUnity.Editor.Tools
 {

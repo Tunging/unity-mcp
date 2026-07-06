@@ -92,7 +92,12 @@ namespace MCPForUnity.Editor.Security
             byte[] master = LoadOrCreate(Path.Combine(_dir, "secret.bin"), 32);
             byte[] salt = LoadOrCreate(Path.Combine(_dir, "salt.bin"), 16);
             string password = Convert.ToBase64String(master) + "|" + MachineId();
+#if UNITY_2021_2_OR_NEWER
             using (var kdf = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
+#else
+            // Unity 2020.3（.NET 4.7.1 API）无 4 参 Rfc2898DeriveBytes（HashAlgorithmName 需 4.7.2+），退回 3 参（内部 SHA1）。
+            using (var kdf = new Rfc2898DeriveBytes(password, salt, Iterations))
+#endif
             {
                 byte[] material = kdf.GetBytes(64);
                 encKey = new byte[32];
@@ -210,11 +215,21 @@ namespace MCPForUnity.Editor.Security
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,
                 };
-                psi.ArgumentList.Add(mode);
-                psi.ArgumentList.Add(path);
+                AppendArg(psi, mode);
+                AppendArg(psi, path);
                 using (var p = System.Diagnostics.Process.Start(psi)) p?.WaitForExit(2000);
             }
             catch { /* hardening is best-effort */ }
+        }
+
+        // Unity 2020.3（net471 API）无 ProcessStartInfo.ArgumentList，用 Arguments 字符串拼接（POSIX 引用）。
+        private static void AppendArg(System.Diagnostics.ProcessStartInfo psi, string arg)
+        {
+            if (psi.Arguments.Length > 0) psi.Arguments += " ";
+            if (arg.Length > 0 && arg.IndexOfAny(new[] { ' ', '"', '\'', '\\', '$', '`', '\t', '\n' }) < 0)
+                psi.Arguments += arg;
+            else
+                psi.Arguments += "'" + arg.Replace("'", "'\\''") + "'";
         }
     }
 }

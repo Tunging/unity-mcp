@@ -7,6 +7,12 @@ using MCPForUnity.Runtime.Helpers;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
+// PrefabStageUtility：2020.3 在 UnityEditor.Experimental.SceneManagement，2021.2 起迁至 UnityEditor.SceneManagement。用别名统一。
+#if UNITY_2021_2_OR_NEWER
+using PrefabStageUtility = UnityEditor.SceneManagement.PrefabStageUtility;
+#else
+using PrefabStageUtility = UnityEditor.Experimental.SceneManagement.PrefabStageUtility;
+#endif
 
 namespace MCPForUnity.Editor.Tools.Graphics
 {
@@ -257,7 +263,7 @@ namespace MCPForUnity.Editor.Tools.Graphics
             EditorUtility.SetDirty(obj);
             if (obj is Component comp)
             {
-                var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+                var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
                 if (prefabStage != null)
                     UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(prefabStage.scene);
                 else

@@ -49,7 +49,7 @@ namespace MCPForUnity.Editor.Security
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                 };
-                foreach (string a in args) psi.ArgumentList.Add(a);
+                foreach (string a in args) AppendArg(psi, a);
                 using (var p = Process.Start(psi))
                 {
                     string outp = p.StandardOutput.ReadToEnd();
@@ -62,6 +62,16 @@ namespace MCPForUnity.Editor.Security
             {
                 return (-1, null, e.Message);
             }
+        }
+
+        // Unity 2020.3（net471 API）无 ProcessStartInfo.ArgumentList，用 Arguments 字符串拼接（POSIX 引用）。
+        private static void AppendArg(System.Diagnostics.ProcessStartInfo psi, string arg)
+        {
+            if (psi.Arguments.Length > 0) psi.Arguments += " ";
+            if (arg.Length > 0 && arg.IndexOfAny(new[] { ' ', '"', '\'', '\\', '$', '`', '\t', '\n' }) < 0)
+                psi.Arguments += arg;
+            else
+                psi.Arguments += "'" + arg.Replace("'", "'\\''") + "'";
         }
     }
 }

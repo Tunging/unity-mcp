@@ -9,6 +9,12 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using MCPForUnity.Runtime.Helpers;
+#if !UNITY_2021_2_OR_NEWER
+// Unity 2020.3：PrefabStage/PrefabStageUtility 位于 UnityEditor.Experimental.SceneManagement，
+// 2021.2 起迁移至 UnityEditor.SceneManagement。用类型别名兼容，升级后自动走原生命名空间。
+using PrefabStage = UnityEditor.Experimental.SceneManagement.PrefabStage;
+using PrefabStageUtility = UnityEditor.Experimental.SceneManagement.PrefabStageUtility;
+#endif
 
 namespace MCPForUnity.Editor.Tools.Prefabs
 {
@@ -419,10 +425,15 @@ namespace MCPForUnity.Editor.Tools.Prefabs
             string[] colorProps = { "_BaseColor", "_Color" };
             foreach (string prop in colorProps)
             {
+#if UNITY_2021_2_OR_NEWER
                 if (mat.HasProperty(prop) && block.HasColor(prop))
                 {
                     mat.SetColor(prop, block.GetColor(prop));
                 }
+#else
+                // Unity 2020.3 无 MaterialPropertyBlock.HasColor（2021.1 引入）；无法判断该颜色是否被 block 覆盖，
+                // 跳过该属性以免用未设置的默认值（Color.clear）覆盖材质颜色。
+#endif
             }
         }
 
@@ -1311,6 +1322,7 @@ namespace MCPForUnity.Editor.Tools.Prefabs
                     return new ErrorResponse($"Prefab asset not found at '{sanitizedPath}'.");
                 }
 
+#if UNITY_2021_2_OR_NEWER
                 var prefabStage = PrefabStageUtility.OpenPrefab(sanitizedPath);
                 bool enteredStage = prefabStage != null
                     && string.Equals(prefabStage.assetPath, sanitizedPath, StringComparison.OrdinalIgnoreCase)
@@ -1331,6 +1343,10 @@ namespace MCPForUnity.Editor.Tools.Prefabs
                         enteredPrefabStage = enteredStage
                     }
                 );
+#else
+                // Unity 2020.3 中 PrefabStageUtility.OpenPrefab 为 internal（2021.2 才 public），无法公开调用。
+                return new ErrorResponse("Opening a prefab in isolation via OpenPrefab requires Unity 2021.2+ (unavailable on 2020.3).");
+#endif
             }
             catch (Exception e)
             {

@@ -14,6 +14,10 @@ using MCPForUnity.Editor.Setup;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if !UNITY_2021_2_OR_NEWER
+// 2020.3：PopupField<T> 位于 UnityEditor.UIElements（DropdownField 的替身），2021.1+ 迁至 UnityEngine.UIElements。
+using UnityEditor.UIElements;
+#endif
 
 namespace MCPForUnity.Editor.Windows.Components.ClientConfig
 {
@@ -24,7 +28,8 @@ namespace MCPForUnity.Editor.Windows.Components.ClientConfig
     public class McpClientConfigSection
     {
         // UI Elements
-        private DropdownField clientDropdown;
+        // 2020.3 无 UnityEngine.UIElements.DropdownField（2021.1 引入）；用其父类 PopupField<string> 兼容。
+        private PopupField<string> clientDropdown;
         private Button configureAllButton;
         private VisualElement clientStatusIndicator;
         private Label clientStatusLabel;
@@ -80,7 +85,7 @@ namespace MCPForUnity.Editor.Windows.Components.ClientConfig
 
         private void CacheUIElements()
         {
-            clientDropdown = Root.Q<DropdownField>("client-dropdown");
+            clientDropdown = Root.Q<PopupField<string>>("client-dropdown");
             configureAllButton = Root.Q<Button>("configure-all-button");
             clientStatusIndicator = Root.Q<VisualElement>("client-status-indicator");
             clientStatusLabel = Root.Q<Label>("client-status");

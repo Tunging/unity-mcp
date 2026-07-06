@@ -1053,19 +1053,49 @@ namespace MCPForUnity.Editor.Windows
 
         private static void BatchUpmAdd(string[] packageIds, Action onComplete = null)
         {
-            var request = UnityEditor.PackageManager.Client.AddAndRemove(packageIds, null);
             EditorUtility.DisplayProgressBar("Installing Packages", $"Installing {packageIds.Length} package(s)...", 0.5f);
+#if UNITY_2021_2_OR_NEWER
+            var request = UnityEditor.PackageManager.Client.AddAndRemove(packageIds, null);
             PollUpmRequest(request, "install", onComplete);
+#else
+            // 2020.3 无 Client.AddAndRemove 批量 API；逐个顺序安装。
+            ProcessUpmSequential(new List<string>(packageIds ?? new string[0]), "install",
+                id => UnityEditor.PackageManager.Client.Add(id), onComplete);
+#endif
         }
 
         private static void BatchUpmRemove(string[] packageIds, Action onComplete = null)
         {
-            var request = UnityEditor.PackageManager.Client.AddAndRemove(null, packageIds);
             EditorUtility.DisplayProgressBar("Removing Packages", $"Removing {packageIds.Length} package(s)...", 0.5f);
+#if UNITY_2021_2_OR_NEWER
+            var request = UnityEditor.PackageManager.Client.AddAndRemove(null, packageIds);
             PollUpmRequest(request, "remove", onComplete);
+#else
+            // 2020.3 无 Client.AddAndRemove 批量 API；逐个顺序移除。
+            ProcessUpmSequential(new List<string>(packageIds ?? new string[0]), "remove",
+                id => UnityEditor.PackageManager.Client.Remove(id), onComplete);
+#endif
         }
 
-        private static void PollUpmRequest(UnityEditor.PackageManager.Requests.AddAndRemoveRequest request, string verb, Action onComplete)
+#if !UNITY_2021_2_OR_NEWER
+        // 顺序执行 UPM 操作：从列表头取一个包，完成后递归处理下一个，全部完成再触发 onComplete。
+        private static void ProcessUpmSequential(List<string> ids, string verb,
+            Func<string, UnityEditor.PackageManager.Requests.Request> op, Action onComplete)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                EditorUtility.ClearProgressBar();
+                onComplete?.Invoke();
+                return;
+            }
+            string id = ids[0];
+            ids.RemoveAt(0);
+            var request = op(id);
+            PollUpmRequest(request, verb, () => ProcessUpmSequential(ids, verb, op, onComplete));
+        }
+#endif
+
+        private static void PollUpmRequest(UnityEditor.PackageManager.Requests.Request request, string verb, Action onComplete)
         {
             EditorApplication.CallbackFunction pollCallback = null;
             pollCallback = () =>

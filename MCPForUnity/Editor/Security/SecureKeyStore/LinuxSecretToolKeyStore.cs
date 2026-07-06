@@ -17,7 +17,7 @@ namespace MCPForUnity.Editor.Security
             try
             {
                 var psi = NewPsi();
-                psi.ArgumentList.Add("--version");
+                AppendArg(psi, "--version");
                 using (var p = Process.Start(psi))
                 {
                     p.WaitForExit(2000);
@@ -36,9 +36,9 @@ namespace MCPForUnity.Editor.Security
             try
             {
                 var psi = NewPsi();
-                psi.ArgumentList.Add("lookup");
-                psi.ArgumentList.Add("service"); psi.ArgumentList.Add(Service);
-                psi.ArgumentList.Add("account"); psi.ArgumentList.Add(providerId);
+                AppendArg(psi, "lookup");
+                AppendArg(psi, "service"); AppendArg(psi, Service);
+                AppendArg(psi, "account"); AppendArg(psi, providerId);
                 using (var p = Process.Start(psi))
                 {
                     string outp = p.StandardOutput.ReadToEnd();
@@ -58,10 +58,10 @@ namespace MCPForUnity.Editor.Security
             try
             {
                 var psi = NewPsi(redirectIn: true);
-                psi.ArgumentList.Add("store");
-                psi.ArgumentList.Add("--label=MCPForUnity AssetGen");
-                psi.ArgumentList.Add("service"); psi.ArgumentList.Add(Service);
-                psi.ArgumentList.Add("account"); psi.ArgumentList.Add(providerId);
+                AppendArg(psi, "store");
+                AppendArg(psi, "--label=MCPForUnity AssetGen");
+                AppendArg(psi, "service"); AppendArg(psi, Service);
+                AppendArg(psi, "account"); AppendArg(psi, providerId);
                 using (var p = Process.Start(psi))
                 {
                     p.StandardInput.Write(apiKey);
@@ -78,9 +78,9 @@ namespace MCPForUnity.Editor.Security
             try
             {
                 var psi = NewPsi();
-                psi.ArgumentList.Add("clear");
-                psi.ArgumentList.Add("service"); psi.ArgumentList.Add(Service);
-                psi.ArgumentList.Add("account"); psi.ArgumentList.Add(providerId);
+                AppendArg(psi, "clear");
+                AppendArg(psi, "service"); AppendArg(psi, Service);
+                AppendArg(psi, "account"); AppendArg(psi, providerId);
                 using (var p = Process.Start(psi)) p.WaitForExit(5000);
             }
             catch { /* best effort */ }
@@ -96,8 +96,18 @@ namespace MCPForUnity.Editor.Security
                 RedirectStandardError = true,
                 RedirectStandardInput = redirectIn,
             };
-            psi.ArgumentList.Add("secret-tool");
+            AppendArg(psi, "secret-tool");
             return psi;
+        }
+
+        // Unity 2020.3（net471 API）无 ProcessStartInfo.ArgumentList，用 Arguments 字符串拼接（POSIX 引用）。
+        private static void AppendArg(System.Diagnostics.ProcessStartInfo psi, string arg)
+        {
+            if (psi.Arguments.Length > 0) psi.Arguments += " ";
+            if (arg.Length > 0 && arg.IndexOfAny(new[] { ' ', '"', '\'', '\\', '$', '`', '\t', '\n' }) < 0)
+                psi.Arguments += arg;
+            else
+                psi.Arguments += "'" + arg.Replace("'", "'\\''") + "'";
         }
     }
 }

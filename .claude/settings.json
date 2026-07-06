@@ -6,6 +6,7 @@
       "MultiEdit(reports/**)"
     ],
     "deny": [
-    ]
+    ],
+    "language":"chinese"
   }
 }

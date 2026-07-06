@@ -167,7 +167,7 @@ namespace MCPForUnity.Editor.Helpers
 #endif
 
             Func<Type, bool> match = isShort
-                ? (t => t.Name.Equals(query, StringComparison.Ordinal))
+                ? (Func<Type, bool>)(t => t.Name.Equals(query, StringComparison.Ordinal))
                 : (t => t.FullName?.Equals(query, StringComparison.Ordinal) ?? false);
 
             var fromPlayer = playerAsms.SelectMany(SafeGetTypes)

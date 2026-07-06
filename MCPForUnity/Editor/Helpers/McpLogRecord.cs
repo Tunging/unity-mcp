@@ -106,7 +106,7 @@ namespace MCPForUnity.Editor.Helpers
 
                 var lines = File.ReadAllLines(path);
                 var half = lines.Length / 2;
-                File.WriteAllLines(path, lines[half..]);
+                File.WriteAllLines(path, new System.ArraySegment<string>(lines, half, lines.Length - half));
             }
             catch
             {

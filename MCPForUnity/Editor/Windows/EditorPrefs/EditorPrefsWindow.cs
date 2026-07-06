@@ -8,6 +8,9 @@ using MCPForUnity.Editor.Helpers;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if !UNITY_2021_2_OR_NEWER
+using UnityEditor.UIElements; // 2020.3：PopupField<T> 在此命名空间（DropdownField 的替身）
+#endif
 
 namespace MCPForUnity.Editor.Windows
 {
@@ -326,7 +329,7 @@ namespace MCPForUnity.Editor.Windows
             var valueField = itemElement.Q<TextField>("value-field");
             valueField.value = item.Value;
 
-            var typeDropdown = itemElement.Q<DropdownField>("type-dropdown");
+            var typeDropdown = itemElement.Q<PopupField<string>>("type-dropdown");
             typeDropdown.index = (int)item.Type;
 
             // Buttons

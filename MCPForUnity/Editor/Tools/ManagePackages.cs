@@ -360,7 +360,12 @@ namespace MCPForUnity.Editor.Tools
 
             try
             {
+#if UNITY_2021_2_OR_NEWER
                 var allPackages = PackageInfo.GetAllRegisteredPackages();
+#else
+                // Unity 2020.3 无 PackageInfo.GetAllRegisteredPackages（2021.1 引入）；已注册包列表不可用，降级为空。
+                var allPackages = System.Array.Empty<PackageInfo>();
+#endif
                 var info = allPackages.FirstOrDefault(pkg =>
                     string.Equals(pkg.name, package, StringComparison.OrdinalIgnoreCase));
 
@@ -593,7 +598,12 @@ namespace MCPForUnity.Editor.Tools
         {
             try
             {
+#if UNITY_2021_2_OR_NEWER
                 var allPackages = PackageInfo.GetAllRegisteredPackages();
+#else
+                // Unity 2020.3 无 PackageInfo.GetAllRegisteredPackages（2021.1 引入）；已注册包列表不可用，降级为空。
+                var allPackages = System.Array.Empty<PackageInfo>();
+#endif
                 return new SuccessResponse(
                     "Package manager is available.",
                     new
@@ -721,7 +731,12 @@ namespace MCPForUnity.Editor.Tools
             {
                 string name = PackageJobManager.ExtractPackageName(packageName);
 
+#if UNITY_2021_2_OR_NEWER
                 var allPackages = PackageInfo.GetAllRegisteredPackages();
+#else
+                // Unity 2020.3 无 PackageInfo.GetAllRegisteredPackages（2021.1 引入）；已注册包列表不可用，降级为空。
+                var allPackages = System.Array.Empty<PackageInfo>();
+#endif
                 return allPackages
                     .Where(pkg => pkg.dependencies.Any(d =>
                         string.Equals(d.name, name, StringComparison.OrdinalIgnoreCase)))

@@ -5,6 +5,10 @@ using MCPForUnity.Editor.Security;
 using MCPForUnity.Editor.Services.AssetGen.Import;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if !UNITY_2021_2_OR_NEWER
+// 2020.3：PopupField<T> 位于 UnityEditor.UIElements（DropdownField 的替身），2021.1+ 迁至 UnityEngine.UIElements。
+using UnityEditor.UIElements;
+#endif
 
 namespace MCPForUnity.Editor.Windows.Components.AssetGen
 {
@@ -38,7 +42,8 @@ namespace MCPForUnity.Editor.Windows.Components.AssetGen
         // UI Elements
         private VisualElement providersContainer;
         private VisualElement gltfastNotice;
-        private DropdownField formatDropdown;
+        // 2020.3 无 UnityEngine.UIElements.DropdownField（2021.1 引入）；用其父类 PopupField<string> 兼容。
+        private PopupField<string> formatDropdown;
         private TextField outputRootField;
         private Toggle autoNormalizeToggle;
 
@@ -60,7 +65,7 @@ namespace MCPForUnity.Editor.Windows.Components.AssetGen
         {
             providersContainer = Root.Q<VisualElement>("assetgen-providers-container");
             gltfastNotice = Root.Q<VisualElement>("gltfast-notice");
-            formatDropdown = Root.Q<DropdownField>("assetgen-format-dropdown");
+            formatDropdown = Root.Q<PopupField<string>>("assetgen-format-dropdown");
             outputRootField = Root.Q<TextField>("assetgen-output-root");
             autoNormalizeToggle = Root.Q<Toggle>("assetgen-auto-normalize");
         }

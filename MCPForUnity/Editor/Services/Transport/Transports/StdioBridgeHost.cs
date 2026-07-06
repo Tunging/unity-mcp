@@ -116,7 +116,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
 
             string fullPath = Path.Combine(
                 Application.dataPath,
-                path.StartsWith("Assets/") ? path[7..] : path
+                path.StartsWith("Assets/") ? path.Substring(7) : path
             );
             return Directory.Exists(fullPath);
         }
@@ -910,7 +910,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
                             status = "error",
                             error = "Invalid JSON format",
                             receivedText = commandText.Length > 50
-                                ? commandText[..50] + "..."
+                                ? commandText.Substring(0, 50) + "..."
                                 : commandText,
                         };
                         tcs.SetResult(JsonConvert.SerializeObject(invalidJsonResponse));
@@ -954,7 +954,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
                         status = "error",
                         error = ex.Message,
                         receivedText = payload?.Length > 50
-                            ? payload[..50] + "..."
+                            ? payload.Substring(0, 50) + "..."
                             : payload,
                     };
                     completionSource.TrySetResult(JsonConvert.SerializeObject(response));
@@ -1123,7 +1123,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
                 {
                     sb.Append(b.ToString("x2"));
                 }
-                return sb.ToString()[..8];
+                return sb.ToString().Substring(0, 8);
             }
             catch
             {

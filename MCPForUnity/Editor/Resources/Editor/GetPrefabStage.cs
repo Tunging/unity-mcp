@@ -2,6 +2,10 @@ using System;
 using MCPForUnity.Editor.Helpers;
 using Newtonsoft.Json.Linq;
 using UnityEditor.SceneManagement;
+#if !UNITY_2021_2_OR_NEWER
+// Unity 2020.3：PrefabStageUtility 位于 UnityEditor.Experimental.SceneManagement，2021.2 起迁移。
+using PrefabStageUtility = UnityEditor.Experimental.SceneManagement.PrefabStageUtility;
+#endif
 
 namespace MCPForUnity.Editor.Resources.Editor
 {

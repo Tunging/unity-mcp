@@ -70,19 +70,22 @@ namespace MCPForUnity.Editor.Tools
                         return UpdateFile(@params);
 
                     case "attach_ui_document":
-                        return AttachUIDocument(@params);
-
                     case "create_panel_settings":
-                        return CreatePanelSettings(@params);
-
                     case "update_panel_settings":
-                        return UpdatePanelSettings(@params);
-
                     case "get_visual_tree":
-                        return GetVisualTree(@params);
-
                     case "render_ui":
-                        return RenderUI(@params);
+#if UNITY_2021_2_OR_NEWER
+                        return action switch
+                        {
+                            "attach_ui_document" => AttachUIDocument(@params),
+                            "create_panel_settings" => CreatePanelSettings(@params),
+                            "update_panel_settings" => UpdatePanelSettings(@params),
+                            "get_visual_tree" => GetVisualTree(@params),
+                            _ => RenderUI(@params),
+                        };
+#else
+                        return UiToolkitUnsupported(action);
+#endif
 
                     case "link_stylesheet":
                         return LinkStylesheet(@params);
@@ -94,10 +97,14 @@ namespace MCPForUnity.Editor.Tools
                         return ListUIAssets(@params);
 
                     case "detach_ui_document":
-                        return DetachUIDocument(@params);
-
                     case "modify_visual_element":
-                        return ModifyVisualElement(@params);
+#if UNITY_2021_2_OR_NEWER
+                        return action == "detach_ui_document"
+                            ? DetachUIDocument(@params)
+                            : ModifyVisualElement(@params);
+#else
+                        return UiToolkitUnsupported(action);
+#endif
 
                     default:
                         return new ErrorResponse($"Unknown action: {action}");
@@ -108,6 +115,15 @@ namespace MCPForUnity.Editor.Tools
                 return new ErrorResponse(ex.Message, new { stackTrace = ex.StackTrace });
             }
         }
+
+#if !UNITY_2021_2_OR_NEWER
+        // 2020.3 无 UI Toolkit runtime（UIDocument/PanelSettings 为 Unity 2021.1+ 引入）；
+        // 相关 action 统一返回不支持，升级到 2021.2+ 自动恢复完整实现。
+        private static object UiToolkitUnsupported(string action)
+            => new ErrorResponse(
+                $"Action '{action}' requires UI Toolkit runtime (UIDocument/PanelSettings), " +
+                "which is unavailable in Unity 2020.3. Upgrade to 2021.2+ to use it.");
+#endif
 
         private static string ValidatePath(string path, out string error)
         {
@@ -296,6 +312,9 @@ namespace MCPForUnity.Editor.Tools
                 new { path });
         }
 
+#if UNITY_2021_2_OR_NEWER
+        // ── 以下 UI Toolkit runtime 相关方法依赖 UIDocument/PanelSettings（Unity 2021.1+）；
+        //    2020.3 下整体禁用，对应 action 由 switch 分支返回 UiToolkitUnsupported。──
         private static object AttachUIDocument(JObject @params)
         {
             var p = new ToolParams(@params);
@@ -620,6 +639,7 @@ namespace MCPForUnity.Editor.Tools
             ps.dynamicAtlasSettings = daCopy;
             changes.Add("dynamicAtlasSettings");
         }
+#endif
 
         // ── Tiny helpers to keep the switch compact ─────────────────────────
 
@@ -704,6 +724,7 @@ namespace MCPForUnity.Editor.Tools
             }
         }
 
+#if UNITY_2021_2_OR_NEWER
         private static object GetVisualTree(JObject @params)
         {
             var p = new ToolParams(@params);
@@ -802,6 +823,7 @@ namespace MCPForUnity.Editor.Tools
 
             return result;
         }
+#endif
 
         // ---- Render UI ----
 
@@ -816,6 +838,7 @@ namespace MCPForUnity.Editor.Tools
         private static bool s_pendingCaptureDone;
         private static bool s_pendingCaptureStarted;
 
+#if UNITY_2021_2_OR_NEWER
         private static object RenderUI(JObject @params)
         {
             var p = new ToolParams(@params);
@@ -1185,6 +1208,7 @@ namespace MCPForUnity.Editor.Tools
                 }
             }
         }
+#endif
 
         // ---- Link Stylesheet ----
 
@@ -1386,6 +1410,7 @@ namespace MCPForUnity.Editor.Tools
 
         // ---- Detach UIDocument ----
 
+#if UNITY_2021_2_OR_NEWER
         private static object DetachUIDocument(JObject @params)
         {
             var p = new ToolParams(@params);
@@ -1720,6 +1745,7 @@ namespace MCPForUnity.Editor.Tools
                 }
             }
         }
+#endif
 
         private static bool? GetNullableBool(this ToolParams p, string key)
         {
