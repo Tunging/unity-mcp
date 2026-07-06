@@ -517,7 +517,7 @@ namespace MCPForUnity.External.Tommy
             if (collapsedItems.Count == 0)
                 return;
 
-            var hasRealValues = !collapsedItems.All(n => n.Value is TomlTable { IsInline: false } or TomlArray { IsTableArray: true });
+            var hasRealValues = !collapsedItems.All(n => (n.Value is TomlTable nt && !nt.IsInline) || (n.Value is TomlArray na && na.IsTableArray));
 
             Comment?.AsComment(tw);
 
@@ -539,7 +539,7 @@ namespace MCPForUnity.External.Tommy
             foreach (var collapsedItem in collapsedItems)
             {
                 var key = collapsedItem.Key;
-                if (collapsedItem.Value is TomlArray { IsTableArray: true } or TomlTable { IsInline: false })
+                if ((collapsedItem.Value is TomlArray ca && ca.IsTableArray) || (collapsedItem.Value is TomlTable ct && !ct.IsInline))
                 {
                     if (!first) tw.WriteLine();
                     first = false;
@@ -819,7 +819,7 @@ namespace MCPForUnity.External.Tommy
                     if (TomlSyntax.IsWhiteSpace(c) || c == TomlSyntax.NEWLINE_CARRIAGE_RETURN_CHARACTER)
                         goto consume_character;
 
-                    if (c is TomlSyntax.COMMENT_SYMBOL or TomlSyntax.NEWLINE_CHARACTER)
+                    if (c == TomlSyntax.COMMENT_SYMBOL || c == TomlSyntax.NEWLINE_CHARACTER)
                     {
                         currentState = ParseState.None;
                         AdvanceLine();
@@ -1863,19 +1863,19 @@ namespace MCPForUnity.External.Tommy
          * A pattern to verify the integer value according to the TOML specification.
          */
         public static readonly Regex IntegerPattern =
-            new(@"^(\+|-)?(?!_)(0|(?!0)(_?\d)*)$", RegexOptions.Compiled);
+            new Regex(@"^(\+|-)?(?!_)(0|(?!0)(_?\d)*)$", RegexOptions.Compiled);
 
         /**
          * A pattern to verify a special 0x, 0o and 0b forms of an integer according to the TOML specification.
          */
         public static readonly Regex BasedIntegerPattern =
-            new(@"^0(?<base>x|b|o)(?!_)(_?[0-9A-F])*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            new Regex(@"^0(?<base>x|b|o)(?!_)(_?[0-9A-F])*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /**
          * A pattern to verify the float value according to the TOML specification.
          */
         public static readonly Regex FloatPattern =
-            new(@"^(\+|-)?(?!_)(0|(?!0)(_?\d)+)(((e(\+|-)?(?!_)(_?\d)+)?)|(\.(?!_)(_?\d)+(e(\+|-)?(?!_)(_?\d)+)?))$",
+            new Regex(@"^(\+|-)?(?!_)(0|(?!0)(_?\d)+)(((e(\+|-)?(?!_)(_?\d)+)?)|(\.(?!_)(_?\d)+(e(\+|-)?(?!_)(_?\d)+)?))$",
                 RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /**
